@@ -75,7 +75,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ```bash
 # 1. Clone or download this repository
-git clone https://github.com/YOUR-USERNAME/ttd-form-helper.git
+git clone https://github.com/gangadhar-sai/Ttd-Form-Helper.git
 cd ttd-form-helper
 
 # 2. Open chrome://extensions in your browser
