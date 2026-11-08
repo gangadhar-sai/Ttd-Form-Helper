@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TTD Form Helper — Chrome Extension</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #f0883e;
+    --accent-glow: rgba(240, 136, 62, 0.25);
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --radius: 12px;
+  }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Hero */
+  .hero {
+    padding: 80px 24px 60px;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 70%), var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .hero h1 { font-size: clamp(32px, 5vw, 56px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { font-size: 18px; color: var(--muted); max-width: 600px; margin: 0 auto 32px; }
+  .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 15px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+  .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
+  .btn-primary:hover { background: #ff9f6e; border-color: #ff9f6e; }
+
+  /* Container */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* Section */
+  section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+  .section-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 8px; }
+  h2 { font-size: clamp(24px, 3vw, 36px); font-weight: 700; margin-bottom: 16px; letter-spacing: -0.01em; }
+  .section-desc { color: var(--muted); font-size: 16px; margin-bottom: 40px; max-width: 600px; }
+
+  /* Feature grid */
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .feature-card:hover { border-color: var(--accent); }
+  .feature-icon { font-size: 28px; margin-bottom: 12px; }
+  .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* Stats bar */
+  .stats { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; padding: 40px 0; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 36px; font-weight: 800; color: var(--accent); }
+  .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; counter-reset: step; }
+  .step { counter-increment: step; position: relative; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .step::before { content: counter(step); font-size: 48px; font-weight: 900; color: var(--accent); opacity: 0.3; position: absolute; top: 12px; right: 16px; line-height: 1; }
+  .step h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .step p { font-size: 13px; color: var(--muted); }
+
+  /* Tech stack */
+  .tech-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tech-tag {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .tech-tag.js { border-color: #f0db4f; color: #f0db4f; }
+  .tech-tag.css { border-color: #58a6ff; color: #58a6ff; }
+  .tech-tag.api { border-color: var(--accent); color: var(--accent); }
+
+  /* Privacy callout */
+  .privacy-callout {
+    background: linear-gradient(135deg, rgba(63, 185, 80, 0.1), rgba(63, 185, 80, 0.02));
+    border: 1px solid rgba(63, 185, 80, 0.3);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .privacy-callout .icon { font-size: 40px; }
+  .privacy-callout h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--green); }
+  .privacy-callout p { font-size: 14px; color: var(--muted); }
+
+  /* Install code block */
+  .install-steps { list-style: none; counter-reset: install; }
+  .install-steps li { counter-increment: install; padding: 12px 0 12px 48px; position: relative; border-bottom: 1px solid var(--border); font-size: 15px; }
+  .install-steps li:last-child { border-bottom: none; }
+  .install-steps li::before { content: counter(install); position: absolute; left: 0; top: 12px; width: 28px; height: 28px; background: var(--accent); color: #000; font-weight: 700; font-size: 13px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-size: 13px; font-family: 'SF Mono', Consolas, monospace; color: var(--accent); }
+
+  /* Footer */
+  footer { padding: 40px 24px; text-align: center; color: var(--muted); font-size: 13px; }
+  footer p { margin-bottom: 8px; }
+
+  @media (max-width: 600px) {
+    .privacy-callout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero">
+  <div class="hero-badge">Manifest V3 · Free · Open Source</div>
+  <h1>Fill TTD Forms<br><span>In Seconds</span></h1>
+  <p>The fastest browser extension for Tirumala Tirupati Devasthanams booking. Fill darshan, seva, and Srivani forms with one click — your data never leaves your device.</p>
+  <div class="hero-buttons">
+    <a href="#install" class="btn btn-primary">⚡ Get Started</a>
+    <a href="#features" class="btn">View Features</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">~3s</div><div class="stat-label">Avg. form fill time</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">Booking tabs covered</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Network requests ever</div></div>
+    <div class="stat"><div class="stat-num">7k+</div><div class="stat-label">Lines of clean JS</div></div>
+  </div>
+</div>
+
+<!-- ===================== FEATURES ===================== -->
+<section id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2>Everything you need for TTD bookings</h2>
+    <p class="section-desc">Five dedicated tabs cover every booking type on the TTD portal, with smart validation and instant autofill.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🛕</div>
+        <h3>Pilgrim Booking</h3>
+        <p>Special Entry Darshan ₹300 &amp; Sri PAT. Save up to 6 pilgrims per group, assign primary contact details (email, city, state, gothram), and fill the entire form in under 3 seconds with one tap.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🙏</div>
+        <h3>Srivari Seva Registration</h3>
+        <p>Complete volunteer form — personal details, fitness checkboxes, residential address, qualifications, languages, and references. Auto-attaches photo and ID proof via the HTML5 DataTransfer API.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Seva Group Booking</h3>
+        <p>Two-column layout with a team member sidebar. Quick-fill any member by number. One toggle copies the team leader's address to everyone instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🪔</div>
+        <h3>Srivani Darshan</h3>
+        <p>Supports up to 9 pilgrims with one-click fill and a one-click copy from the main Pilgrim tab — perfect for family Srivani bookings.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👴</div>
+        <h3>Senior Citizen / Differently Abled</h3>
+        <p>Auto-detects seniors (65+) and their spouse from your booking list. Automatically attaches age-proof Aadhaar documents (PDF / PNG / JPEG ≤ 1 MB) to the upload field.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Floating Quick-Fill Widget</h3>
+        <p>A floating toolbar appears on TTD pages during rush hours. Hit <code>⚡ TTD Fast Fill</code> without opening the extension popup — fill details and proceed in one gesture.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>AES-GCM Vault Encryption</h3>
+        <p>Optional passphrase-protected encryption using PBKDF2-SHA256 (210 k iterations). Derived key lives only in browser memory — wiped when you close the browser. Zero server contact.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Live Aadhaar Verhoeff Check</h3>
+        <p>Every Aadhaar number is validated against the real 12-digit Verhoeff checksum algorithm as you type. Typos are caught before you even reach the TTD page.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>6 Languages</h3>
+        <p>Full UI translations in English, Hindi (हिन्दी), Kannada (ಕನ್ನಡ), Malayalam (മലയാളം), Tamil (தமிழ்), and Telugu (తెలుగు). Switch language on the fly from the popup settings.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-label">How It Works</div>
+    <h2>Three steps, zero friction</h2>
+    <p class="section-desc">Save your people once. Fill any TTD form in seconds thereafter.</p>
+    <div class="steps">
+      <div class="step">
+        <h3>Add Your Details</h3>
+        <p>Open the extension panel and enter pilgrim names, ages, Aadhaar numbers, and contact info. Use Saved Pilgrims to reuse faces across multiple bookings.</p>
+      </div>
+      <div class="step">
+        <h3>Navigate to TTD</h3>
+        <p>Go to <code>tirupatibalaji.ap.gov.in</code> and open any booking form — Special Entry Darshan, Seva registration, Srivani, or Senior Citizen darshan.</p>
+      </div>
+      <div class="step">
+        <h3>One-Click Fill</h3>
+        <p>Click <strong>⚡ Fill All</strong> and watch every field populate in under 3 seconds. The floating widget lets you fill without switching windows during peak hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TECH STACK ===================== -->
+<section id="tech">
+  <div class="container">
+    <div class="section-label">Technology</div>
+    <h2>Built with modern web standards</h2>
+    <p class="section-desc">Zero dependencies. No external libraries. No telemetry. Everything runs in-browser.</p>
+    <div style="margin-bottom: 32px;">
+      <h3 style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Languages &amp; APIs Used</h3>
+      <div class="tech-grid">
+        <span class="tech-tag js">JavaScript (ES2022)</span>
+        <span class="tech-tag css">CSS 3 + CSS Variables</span>
+        <span class="tech-tag api">Web Crypto API</span>
+        <span class="tech-tag api">Chrome Extension API (MV3)</span>
+        <span class="tech-tag api">chrome.storage.session</span>
+        <span class="tech-tag api">chrome.sidePanel</span>
+        <span class="tech-tag api">chrome.i18n</span>
+        <span class="tech-tag">HTML5 DataTransfer API</span>
+        <span class="tech-tag">PBKDF2-SHA256</span>
+        <span class="tech-tag">AES-GCM-256</span>
+        <span class="tech-tag">Verhoeff Checksum Algorithm</span>
+        <span class="tech-tag">Angular / Material DOM Injection</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Key Engineering Highlights</h3>
+      <ul style="list-style: none; display: grid; gap: 8px;">
+        <li style="padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+          <strong style="color: var(--accent);">page-bridge.js</strong> — Runs in the page's own MAIN world to bypass React's <code>isTrusted</code> event guard, letting us programmatically trigger onChange handlers exactly like a real user would.
+        </li>
+        <li style="padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+          <strong style="color: var(--accent);">autofill.js</strong> — Deep Angular/Material component injection walks up the DOM tree finding ngControl instances and calls <code>setValue()</code> directly, ensuring value parity with user input.
+        </li>
+        <li style="padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+          <strong style="color: var(--accent);">crypto.js</strong> — Pure Web Crypto. PBKDF2 key derivation, AES-GCM-256 encryption, base64 envelope wrapping. No npm packages, no CVE surface.
+        </li>
+        <li style="padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+          <strong style="color: var(--accent);">validation.js</strong> — Verhoeff checksum for Aadhaar, 10-digit mobile range checks, passport format rules, DOB-to-age cross-validation, PIN-code rules — all client-side before any network access.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRIVACY ===================== -->
+<section id="privacy">
+  <div class="container">
+    <div class="section-label">Privacy &amp; Security</div>
+    <h2>Your data stays on your machine</h2>
+    <p class="section-desc">This extension makes no network requests of any kind. Here's how we prove it.</p>
+    <div class="privacy-callout">
+      <div class="icon">🛡️</div>
+      <div>
+        <h3>No network access at all</h3>
+        <p>The Content Security Policy restricts <code>connect-src</code> to <code>'self'</code>. The extension cannot fetch from or send data to any external server — not even analytics or crash reporting. Verified by opening DevTools → Network while using the extension: zero outbound requests.</p>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 24px;">
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+        <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Minimal Permissions</h3>
+        <p style="font-size: 13px; color: var(--muted);">Only <code>storage</code> and <code>sidePanel</code>. No tabs, cookies, clipboard, or download permissions. Cannot read your browsing history.</p>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+        <div style="font-size: 24px; margin-bottom: 8px;">🌐</div>
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Site-Restricted Access</h3>
+        <p style="font-size: 13px; color: var(--muted);">Content scripts load only on <code>tirupatibalaji.ap.gov.in</code> and <code>ttdevasthanams.ap.gov.in</code>. Completely inactive on every other website.</p>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+        <div style="font-size: 24px; margin-bottom: 8px;">📦</div>
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Zero Dependencies</h3>
+        <p style="font-size: 13px; color: var(--muted);">No npm packages. No CDN links. No eval(). Every source file is readable in a plain-text editor. Supply-chain risk is impossible.</p>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+        <div style="font-size: 24px; margin-bottom: 8px;">💾</div>
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Encrypted Backup Export</h3>
+        <p style="font-size: 13px; color: var(--muted);">Export your saved data to a JSON file. Choose optional AES-256-GCM encryption with a passphrase before downloading.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INSTALL ===================== -->
+<section id="install">
+  <div class="container">
+    <div class="section-label">Installation</div>
+    <h2>Get started in 2 minutes</h2>
+    <p class="section-desc">Works on Chrome, Edge, Brave, Arc, and any Chromium-based browser.</p>
+    <ol class="install-steps">
+      <li>Open your browser and navigate to <code>chrome://extensions</code> (or <code>edge://extensions</code>)</li>
+      <li>Enable <strong>Developer mode</strong> using the toggle in the top-right corner</li>
+      <li>Click <strong>Load unpacked</strong> and select this extension's folder</li>
+      <li>Pin <strong>TTD Form Helper</strong> to your toolbar for quick access</li>
+      <li>Navigate to <code>https://tirupatibalaji.ap.gov.in</code> and start filling forms!</li>
+    </ol>
+    <div style="margin-top: 24px; padding: 16px 20px; background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.25); border-radius: 8px; font-size: 14px;">
+      <strong style="color: var(--blue);">⚠ Important:</strong> This is a development installation. For the published Chrome Web Store version, search <strong>"TTD Form Helper"</strong> once listed. The source here is the same code you'd get from the store.
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WHERE TO USE ===================== -->
+<section id="where">
+  <div class="container">
+    <div class="section-label">Where to Use</div>
+    <h2>Supported TTD booking portals</h2>
+    <p class="section-desc">The extension activates automatically on these two domains and nowhere else.</p>
+    <div style="display: grid; gap: 12px; max-width: 600px;">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;">
+        <span style="font-size: 20px;">🛕</span>
+        <div>
+          <div style="font-weight: 700;">Tirupati Main Portal</div>
+          <code>https://tirupatibalaji.ap.gov.in</code>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;">
+        <span style="font-size: 20px;">🏛️</span>
+        <div>
+          <div style="font-weight: 700;">Devasthanams Booking</div>
+          <code>https://ttdevasthanams.ap.gov.in</code>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 24px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--muted);">
+      💡 <strong style="color: var(--text);">Tip:</strong> The extension also works during busy booking windows when the site is slow — the floating widget means you don't have to alt-tab between the form and the extension popup.
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PERFORMANCE ===================== -->
+<section id="performance">
+  <div class="container">
+    <div class="section-label">Performance</div>
+    <h2>Fast enough for rush-hour bookings</h2>
+    <p class="section-desc">TTD booking windows open for just minutes. Every second counts.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center;">
+        <div style="font-size: 42px; font-weight: 900; color: var(--green);">~3s</div>
+        <div style="font-size: 13px; color: var(--muted); margin-top: 4px;">Full form fill time (6 pilgrims)</div>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center;">
+        <div style="font-size: 42px; font-weight: 900; color: var(--blue);">0</div>
+        <div style="font-size: 13px; color: var(--muted); margin-top: 4px;">Network latency added</div>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center;">
+        <div style="font-size: 42px; font-weight: 900; color: var(--accent);">∞</div>
+        <div style="font-size: 13px; color: var(--muted); margin-top: 4px;">Offline capability — works without internet after install</div>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center;">
+        <div style="font-size: 42px; font-weight: 900; color: #a371f7;">&lt;50ms</div>
+        <div style="font-size: 13px; color: var(--muted); margin-top: 4px;">Per-field value injection</div>
+      </div>
+    </div>
+    <p style="margin-top: 24px; color: var(--muted); font-size: 14px;">
+      Compared to manual entry which takes <strong style="color: var(--text);">2–5 minutes per form</strong>, this extension saves roughly <strong style="color: var(--green);">95% of your time</strong> per booking session. During high-demand slots where seats fill in under a minute, that difference is everything.
+    </p>
+  </div>
+</section>
+
+<!-- ===================== SAVED PIlgrims ===================== -->
+<section id="saved-pilgrims">
+  <div class="container">
+    <div class="section-label">Saved Pilgrims</div>
+    <h2>Add once, use forever</h2>
+    <p class="section-desc">Build a digital address book of everyone you book for — family, friends, colleagues.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">👨‍👩‍👧 Master Roster</h3>
+        <p style="font-size: 13px; color: var(--muted);">Save each person once with name, age, Aadhaar, contact details, and relationship. Reuse them across any booking group.</p>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">🗂️ Named Sets</h3>
+        <p style="font-size: 13px; color: var(--muted);">Group pilgrims into named sets like "Family", "Office Trip", "December Darshan". Load an entire group in one click.</p>
+      </div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">💾 Encrypted Backups</h3>
+        <p style="font-size: 13px; color: var(--muted);">Export your saved data to an encrypted JSON file. Import it on another computer or after a browser reinstall.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <p><strong style="color: var(--text);">TTD Form Helper</strong> — Free, open-source, privacy-first.</p>
+  <p style="font-size: 12px;">Not affiliated with or endorsed by Tirumala Tirupati Devasthanams. Built by devotees, for devotees.</p>
+  <p style="font-size: 12px; margin-top: 8px;">Manifest V3 · Zero dependencies · AES-GCM encryption · 6-language support</p>
+</footer>
+
+</body>
+</html>

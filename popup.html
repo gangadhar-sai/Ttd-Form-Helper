@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTD Form Helper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Status Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Top Tab Navigation -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="pilgrim">
+      <span class="tab-icon">🛕</span>
+      <span class="tab-label">Pilgrim Booking</span>
+    </button>
+    <button class="tab-btn" data-tab="srivari">
+      <span class="tab-icon">🙏</span>
+      <span class="tab-label">Srivari Seva</span>
+    </button>
+    <button class="tab-btn" data-tab="seva-group">
+      <span class="tab-icon">👥</span>
+      <span class="tab-label">Seva (Group)</span>
+    </button>
+    <button class="tab-btn" data-tab="srivani">
+      <span class="tab-icon">🪔</span>
+      <span class="tab-label">Srivani</span>
+    </button>
+    <button class="tab-btn" data-tab="senior">
+      <span class="tab-icon">👴</span>
+      <span class="tab-label">Senior Citizen</span>
+    </button>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="content-container">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: PILGRIM BOOKING (SPECIAL ENTRY)    -->
+    <!-- ========================================== -->
+    <section id="pilgrim" class="tab-pane active">
+      <!-- Quick Action Buttons -->
+      <div class="action-grid">
+        <button class="btn btn-action-primary" id="btn-fill-all" title="Fast fill all pilgrims onto TTD form">
+          <span class="action-icon">⚡</span>
+          <span class="action-text">Fill all</span>
+        </button>
+        <button class="btn btn-action" id="btn-next" title="Click Next on TTD form">
+          <span class="action-icon">ℹ️</span>
+          <span class="action-text">Next</span>
+        </button>
+        <button class="btn btn-action" id="btn-continue" title="Click Continue on TTD form">
+          <span class="action-icon">⏩</span>
+          <span class="action-text">Continue</span>
+        </button>
+        <button class="btn btn-action" id="btn-clear" title="Clear current booking fields">
+          <span class="action-icon">🧹</span>
+          <span class="action-text">Clear</span>
+        </button>
+      </div>
+
+      <!-- Group Management Row -->
+      <div class="group-bar">
+        <div class="group-select-wrap">
+          <label class="field-label-sm">Booking Group:</label>
+          <select id="group-select" class="group-dropdown">
+            <option value="default">Default Group</option>
+          </select>
+        </div>
+        <div class="group-btn-wrap">
+          <button class="btn-sm btn-ghost" id="btn-new-group" title="Create new group">+ New</button>
+          <button class="btn-sm btn-ghost text-danger" id="btn-delete-group" title="Delete current group">🗑️</button>
+        </div>
+      </div>
+
+      <!-- Pilgrims Count Header -->
+      <div class="section-header">
+        <span class="section-title">Pilgrims (<span id="pilgrim-count">0</span>) (<span id="pilgrim-count-ratio">0/6</span> pilgrims)</span>
+        <button class="btn-link" id="btn-clear-booking-list" title="Remove all from this booking">Clear List</button>
+      </div>
+
+      <!-- Active Pilgrims List Cards -->
+      <div id="pilgrims-list" class="pilgrim-cards-container">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Accordion: Add from Saved Master Roster -->
+      <div class="accordion-item" id="acc-saved-pilgrims">
+        <button class="accordion-header" id="btn-toggle-saved">
+          <span class="acc-title">👥 Add from Saved Pilgrims (<span id="saved-pilgrims-count">0</span>)</span>
+          <span class="acc-arrow">▼</span>
+        </button>
+        <div class="accordion-body hidden" id="saved-pilgrims-body">
+          <div id="saved-pilgrims-list" class="saved-roster-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Add / Edit Pilgrim Card Form -->
+      <div class="card form-card" id="pilgrim-form-card">
+        <div class="card-header">
+          <h3 id="form-card-title">Add Pilgrim</h3>
+          <button class="btn-link hidden" id="btn-cancel-edit">Cancel Edit</button>
+        </div>
+
+        <form id="form-pilgrim" autocomplete="off">
+          <input type="hidden" id="edit-pilgrim-id" value="">
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="p-name">Name *</label>
+              <input type="text" id="p-name" placeholder="Full name as per ID" required>
+            </div>
+            <div class="form-group">
+              <label for="p-relation">Relationship</label>
+              <input type="text" id="p-relation" placeholder="e.g., Self, Spouse, Father">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="p-age">Age *</label>
+              <input type="number" id="p-age" min="1" max="110" placeholder="Age" required>
+            </div>
+            <div class="form-group">
+              <label for="p-gender">Gender *</label>
+              <select id="p-gender" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Transgender">Transgender</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="p-id-type">ID Proof *</label>
+              <select id="p-id-type" required>
+                <option value="Aadhaar Card">Aadhaar Card</option>
+                <option value="Voter ID">Voter ID</option>
+                <option value="Passport">Passport</option>
+                <option value="PAN Card">PAN Card</option>
+                <option value="Driving License">Driving License</option>
+                <option value="Ration Card">Ration Card</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="p-id-number">ID Proof Number *</label>
+              <input type="text" id="p-id-number" placeholder="Enter ID number" required>
+            </div>
+          </div>
+
+          <!-- Aadhaar Checksum Indicator -->
+          <div id="aadhaar-feedback" class="feedback-text hidden"></div>
+
+          <!-- Contact Details Accordion (Open by default for TTD General Details) -->
+          <div class="sub-accordion">
+            <button type="button" class="sub-acc-header" id="btn-toggle-contact">
+              <span class="sub-acc-arrow">▾</span>
+              <span class="sub-acc-title">Contact details for the booking (General Details)</span>
+            </button>
+            <div class="sub-acc-body" id="contact-details-body">
+              <p class="sub-acc-hint">TTD asks for 1 set of General Details per booking (Email, City, State, Country, PIN). These are used for the entire booking group.</p>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="p-email">Email Address *</label>
+                  <input type="email" id="p-email" placeholder="email@gmail.com">
+                </div>
+                <div class="form-group">
+                  <label for="p-city">City *</label>
+                  <input type="text" id="p-city" placeholder="e.g., Vizag / Hyderabad">
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="p-state">State *</label>
+                  <input type="text" id="p-state" placeholder="Andhra Pradesh">
+                </div>
+                <div class="form-group">
+                  <label for="p-country">Country *</label>
+                  <input type="text" id="p-country" placeholder="e.g., India, USA, UK" value="India">
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="p-pincode">Pincode *</label>
+                  <input type="text" id="p-pincode" placeholder="e.g., 530011" maxlength="6">
+                </div>
+                <div class="form-group">
+                  <label for="p-gothram">Gothram</label>
+                  <input type="text" id="p-gothram" placeholder="e.g., Kasyapa">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group mt-sm">
+            <label for="p-notes">Notes</label>
+            <input type="text" id="p-notes" placeholder="Optional — anything you want to remember">
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="p-save-to-roster" checked>
+              <span>Also save to master roster for future bookings</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="btn-submit-pilgrim">
+            Add Pilgrim
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: SRIVARI SEVA                       -->
+    <!-- ========================================== -->
+    <section id="srivari" class="tab-pane">
+      <div class="top-action-bar">
+        <button class="btn btn-primary btn-block" id="btn-fill-srivari">
+          ⚡ Apply to Form
+        </button>
+      </div>
+
+      <!-- Live validation error indicator -->
+      <div id="srivari-validation-box" class="warning-box hidden">
+        <div class="warning-title">Fix these before filling:</div>
+        <ul id="srivari-missing-list" class="warning-list"></ul>
+      </div>
+
+      <!-- Personal Details -->
+      <div class="card">
+        <h4 class="card-subheading">PERSONAL DETAILS</h4>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-name">Full Name (as per Aadhaar) *</label>
+            <input type="text" id="sv-name" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label for="sv-surname">Surname</label>
+            <input type="text" id="sv-surname" placeholder="Surname">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-father">Father's/Husband's Name *</label>
+            <input type="text" id="sv-father" placeholder="Father or Husband name">
+          </div>
+          <div class="form-group">
+            <label for="sv-marital">Marital Status *</label>
+            <select id="sv-marital">
+              <option value="">Select</option>
+              <option value="Married">Married</option>
+              <option value="Single">Single / Unmarried</option>
+              <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-dob">Date of Birth * (DD/MM/YYYY)</label>
+            <input type="text" id="sv-dob" placeholder="DD/MM/YYYY">
+          </div>
+          <div class="form-group">
+            <label for="sv-age">Age *</label>
+            <input type="number" id="sv-age" placeholder="Age">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-mobile">Mobile Number *</label>
+            <input type="tel" id="sv-mobile" placeholder="10-digit mobile" maxlength="10">
+          </div>
+          <div class="form-group">
+            <label for="sv-alt-mobile">Alternate Mobile</label>
+            <input type="tel" id="sv-alt-mobile" placeholder="10-digit alternate">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-email">Email Id *</label>
+            <input type="email" id="sv-email" placeholder="Email address">
+          </div>
+          <div class="form-group">
+            <label for="sv-blood">Blood Group</label>
+            <select id="sv-blood">
+              <option value="">Select</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Gender *</label>
+          <div class="radio-inline-group">
+            <label class="radio-label"><input type="radio" name="sv-gender" value="Male" checked> Male</label>
+            <label class="radio-label"><input type="radio" name="sv-gender" value="Female"> Female</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Fitness *</label>
+          <div class="checkbox-inline-group">
+            <label class="checkbox-label"><input type="checkbox" id="sv-fit-mental" checked> Mentally Fit</label>
+            <label class="checkbox-label"><input type="checkbox" id="sv-fit-physical" checked> Physically Fit</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Residential Address -->
+      <div class="card">
+        <h4 class="card-subheading">RESIDENTIAL ADDRESS</h4>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-door">Door No *</label>
+            <input type="text" id="sv-door" placeholder="Door No">
+          </div>
+          <div class="form-group">
+            <label for="sv-street">Street *</label>
+            <input type="text" id="sv-street" placeholder="Street / Area">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-pincode">Pincode *</label>
+            <input type="text" id="sv-pincode" placeholder="6-digit PIN" maxlength="6">
+          </div>
+          <div class="form-group">
+            <label for="sv-country">Country *</label>
+            <input type="text" id="sv-country" value="India">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-state">State *</label>
+            <input type="text" id="sv-state" placeholder="e.g., Andhra Pradesh">
+          </div>
+          <div class="form-group">
+            <label for="sv-district">District *</label>
+            <input type="text" id="sv-district" placeholder="District">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-city">City *</label>
+            <input type="text" id="sv-city" placeholder="City">
+          </div>
+          <div class="form-group">
+            <label for="sv-temple">Nearest TTD Temple *</label>
+            <input type="text" id="sv-temple" placeholder="e.g., Tirupati / Hyderabad">
+          </div>
+        </div>
+      </div>
+
+      <!-- Uploads: Photo & ID Proof -->
+      <div class="card">
+        <h4 class="card-subheading">UPLOADS</h4>
+
+        <div class="form-group">
+          <label>Photo (Max 1 MB • JPEG, PNG)</label>
+          <div class="file-uploader-box">
+            <input type="file" id="sv-photo-file" accept="image/jpeg,image/png">
+            <span class="file-status" id="sv-photo-status">No file chosen</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Upload ID Proof * (Max 1 MB • JPEG, PNG, PDF)</label>
+          <div class="file-uploader-box">
+            <input type="file" id="sv-id-file" accept="image/jpeg,image/png,application/pdf">
+            <span class="file-status" id="sv-id-status">No file chosen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volunteer Details -->
+      <div class="card">
+        <h4 class="card-subheading">VOLUNTEER DETAILS</h4>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-qualification">Qualification *</label>
+            <input type="text" id="sv-qualification" placeholder="e.g., B.Tech / Degree">
+          </div>
+          <div class="form-group">
+            <label for="sv-profession">Profession *</label>
+            <input type="text" id="sv-profession" placeholder="e.g., Engineer / Teacher">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="sv-empid">Employee ID</label>
+            <input type="text" id="sv-empid" placeholder="Optional">
+          </div>
+          <div class="form-group">
+            <label for="sv-designation">Designation / Retired as</label>
+            <input type="text" id="sv-designation" placeholder="Designation">
+          </div>
+        </div>
+      </div>
+
+      <!-- Experience & References -->
+      <div class="card">
+        <h4 class="card-subheading">EXPERIENCE & REFERENCES</h4>
+        <div class="form-group">
+          <label>Previously Volunteered?</label>
+          <div class="radio-inline-group">
+            <label class="radio-label"><input type="radio" name="sv-prev-vol" value="No" checked> No</label>
+            <label class="radio-label"><input type="radio" name="sv-prev-vol" value="Yes"> Yes</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Languages Known</label>
+          <div class="checkbox-grid">
+            <label class="checkbox-label"><input type="checkbox" class="sv-lang" value="Telugu" checked> Telugu</label>
+            <label class="checkbox-label"><input type="checkbox" class="sv-lang" value="English" checked> English</label>
+            <label class="checkbox-label"><input type="checkbox" class="sv-lang" value="Hindi"> Hindi</label>
+            <label class="checkbox-label"><input type="checkbox" class="sv-lang" value="Tamil"> Tamil</label>
+            <label class="checkbox-label"><input type="checkbox" class="sv-lang" value="Kannada"> Kannada</label>
+          </div>
+        </div>
+
+        <div class="ref-block">
+          <div class="ref-title">1. Reference</div>
+          <div class="form-row-3">
+            <input type="text" id="sv-ref1-name" placeholder="Name">
+            <input type="text" id="sv-ref1-rel" placeholder="Relation">
+            <input type="tel" id="sv-ref1-mobile" placeholder="Mobile">
+          </div>
+        </div>
+
+        <div class="ref-block mt-sm">
+          <div class="ref-title">2. Reference</div>
+          <div class="form-row-3">
+            <input type="text" id="sv-ref2-name" placeholder="Name">
+            <input type="text" id="sv-ref2-rel" placeholder="Relation">
+            <input type="tel" id="sv-ref2-mobile" placeholder="Mobile">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block mb-lg" id="btn-save-srivari">
+        💾 Save Srivari Seva Profile
+      </button>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: SEVA (GROUP)                        -->
+    <!-- ========================================== -->
+    <section id="seva-group" class="tab-pane">
+      <div class="group-seva-layout">
+        <!-- Left Sidebar: Member Roster -->
+        <div class="seva-sidebar">
+          <div class="sidebar-header">
+            <h4>MEMBERS (<span id="sg-count">1</span>)</h4>
+            <button class="btn-icon" id="btn-sg-add" title="Add Member">+</button>
+          </div>
+
+          <div class="quick-fill-box">
+            <label class="field-label-sm">FILL MEMBER #</label>
+            <div class="quick-fill-input-row">
+              <input type="number" id="sg-quick-num" min="1" max="15" value="1">
+              <button class="btn-sm btn-action-primary" id="btn-sg-fill-single">⚡ Fill</button>
+            </div>
+          </div>
+
+          <ul class="seva-member-list" id="sg-member-list">
+            <!-- Rendered dynamically -->
+          </ul>
+
+          <button class="btn btn-action-primary btn-block mt-sm" id="btn-sg-fill-all">
+            ⚡ Fill Group
+          </button>
+        </div>
+
+        <!-- Right Panel: Member Form Details -->
+        <div class="seva-main-panel">
+          <div class="panel-header">
+            <h4 id="sg-current-title">#1 Team Leader Details</h4>
+            <label class="checkbox-label-sm">
+              <input type="checkbox" id="sg-copy-address">
+              <span>Copy Address to All</span>
+            </label>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="sg-id-type">ID Proof Type *</label>
+              <select id="sg-id-type">
+                <option value="Aadhaar Card">Aadhaar Card</option>
+                <option value="Voter ID">Voter ID</option>
+                <option value="Passport">Passport</option>
+                <option value="PAN Card">PAN Card</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="sg-id-number">ID Proof Number *</label>
+              <input type="text" id="sg-id-number" placeholder="Enter ID number">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="sg-name">Name *</label>
+              <input type="text" id="sg-name" placeholder="Name">
+            </div>
+            <div class="form-group">
+              <label for="sg-surname">Surname</label>
+              <input type="text" id="sg-surname" placeholder="Surname">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="sg-father">Father/Spouse Name *</label>
+              <input type="text" id="sg-father" placeholder="Father or Spouse">
+            </div>
+            <div class="form-group">
+              <label for="sg-dob">Date of Birth * (DD/MM/YYYY)</label>
+              <input type="text" id="sg-dob" placeholder="DD/MM/YYYY">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="sg-age">Age *</label>
+              <input type="number" id="sg-age" placeholder="Age">
+            </div>
+            <div class="form-group">
+              <label for="sg-mobile">Mobile Number *</label>
+              <input type="tel" id="sg-mobile" placeholder="Mobile">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="sg-email">Email Id</label>
+              <input type="email" id="sg-email" placeholder="Email">
+            </div>
+            <div class="form-group">
+              <label for="sg-blood">Blood Group</label>
+              <select id="sg-blood">
+                <option value="">Select</option>
+                <option value="A+">A+</option>
+                <option value="B+">B+</option>
+                <option value="O+">O+</option>
+                <option value="AB+">AB+</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Gender *</label>
+            <div class="radio-inline-group">
+              <label class="radio-label"><input type="radio" name="sg-gender" value="Male" checked> Male</label>
+              <label class="radio-label"><input type="radio" name="sg-gender" value="Female"> Female</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Fitness *</label>
+            <div class="checkbox-inline-group">
+              <label class="checkbox-label"><input type="checkbox" id="sg-fit-mental" checked> Mentally Fit</label>
+              <label class="checkbox-label"><input type="checkbox" id="sg-fit-physical" checked> Physically Fit</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="sg-address">Full Residential Address *</label>
+            <textarea id="sg-address" rows="2" placeholder="Door No, Street, City, State, PIN"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Photo (Max 1MB)</label>
+            <input type="file" id="sg-photo-file" accept="image/*">
+            <span class="file-status" id="sg-photo-status">No photo</span>
+          </div>
+
+          <button class="btn btn-secondary btn-block mt-sm" id="btn-sg-save-member">
+            💾 Save Member Details
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: SRIVANI                            -->
+    <!-- ========================================== -->
+    <section id="srivani" class="tab-pane">
+      <div class="top-action-bar">
+        <button class="btn btn-primary btn-block" id="btn-fill-srivani">
+          ⚡ Fill Srivani Details
+        </button>
+      </div>
+
+      <div class="section-header">
+        <span class="section-title">People (<span id="srivani-count">0</span>/9)</span>
+        <button class="btn-link" id="btn-srivani-copy-from-pilgrim">Copy from Pilgrim Tab</button>
+      </div>
+
+      <div id="srivani-people-list" class="pilgrim-cards-container">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="card form-card mt-md">
+        <h4>Add Person</h4>
+        <form id="form-srivani-person">
+          <div class="form-group">
+            <label for="svani-name">Name *</label>
+            <input type="text" id="svani-name" placeholder="Full name" required>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="svani-age">Age *</label>
+              <input type="number" id="svani-age" placeholder="Age" required>
+            </div>
+            <div class="form-group">
+              <label for="svani-gender">Gender *</label>
+              <select id="svani-gender" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Transgender">Transgender</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="svani-id-type">ID Proof Type *</label>
+              <select id="svani-id-type">
+                <option value="Aadhaar Card">Aadhaar Card</option>
+                <option value="Passport">Passport</option>
+                <option value="Voter ID">Voter ID</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="svani-id-number">ID Proof Number *</label>
+              <input type="text" id="svani-id-number" placeholder="ID Number" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block mt-sm">
+            Add Person
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: SENIOR CITIZEN                     -->
+    <!-- ========================================== -->
+    <section id="senior" class="tab-pane">
+      <div class="action-stack">
+        <button class="btn btn-action-primary btn-block" id="btn-fill-senior">
+          👴 Fill senior citizen + spouse, attach age proof
+        </button>
+        <button class="btn btn-action btn-block" id="btn-fill-senior-continue">
+          ⏩ Fill, attach & Continue
+        </button>
+      </div>
+
+      <div class="external-link-row">
+        <a href="https://ttdevasthanams.ap.gov.in" target="_blank" class="external-link">Open Booking Page ↗</a>
+      </div>
+
+      <!-- Verification banner -->
+      <div class="notice-box">
+        <div class="notice-title">Check before filling</div>
+        <div class="notice-text">
+          • TTD requires the Aadhaar of the senior citizen as a PDF, PNG or JPEG of at most 1 MB.
+        </div>
+      </div>
+
+      <div class="section-title mt-md mb-xs">Who is booked</div>
+      <div class="sub-acc-hint mb-sm">These come from the 🛕 Pilgrim tab's booking list, in its order: the first is the senior citizen and the second, if any, is their spouse.</div>
+
+      <div id="senior-booked-display" class="senior-display-card">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Age proof uploader -->
+      <div class="card mt-md">
+        <h4 class="card-subheading">Age proof (Aadhaar)</h4>
+        <div id="senior-file-display" class="file-chosen-status">No file saved.</div>
+
+        <label class="btn btn-primary file-input-label mt-sm">
+          📎 Choose PDF / PNG...
+          <input type="file" id="senior-proof-file" accept=".pdf,.png,.jpg,.jpeg" class="hidden-file-input">
+        </label>
+
+        <p class="security-note mt-sm">
+          Stored only in this browser. It goes to TTD only when you fill the page, and TTD receives it only when you press Continue.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

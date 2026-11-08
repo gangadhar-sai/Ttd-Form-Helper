@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tirumala Tirupati Devasthanams - Form Automation Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background-color: #faf5f8;
+      color: #333;
+      margin: 0;
+      padding: 24px;
+    }
+    .top-header {
+      background: #731e6f;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .top-header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e2d8e0;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 18px;
+    }
+    .summary-grid {
+      display: flex;
+      gap: 30px;
+      font-size: 13px;
+    }
+    .summary-item label {
+      display: block;
+      color: #777;
+      margin-bottom: 4px;
+    }
+    .summary-item strong {
+      color: #222;
+      font-size: 14px;
+    }
+
+    /* Angular Material Form Field Simulation */
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+    .form-grid-5 {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1.5fr 1.5fr 2fr;
+      gap: 16px;
+      margin-bottom: 16px;
+      align-items: start;
+    }
+
+    mat-form-field, .mat-form-field {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    mat-label, .mat-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .text-danger {
+      color: #c92a2a;
+    }
+
+    input, select, mat-select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 4px;
+      border: none;
+      border-bottom: 1.5px solid #ccc;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, mat-select:focus {
+      border-bottom-color: #852269;
+    }
+
+    .mat-error {
+      color: #c92a2a;
+      font-size: 11px;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .mat-error.hidden {
+      display: none !important;
+    }
+
+    /* Custom Mat-Select Simulation */
+    mat-select {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-right: 8px;
+    }
+    mat-select::after {
+      content: "▾";
+      font-size: 12px;
+      color: #666;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 24px 0;
+    }
+
+    .btn-submit {
+      background: #731e6f;
+      color: #fff;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      float: right;
+    }
+    .btn-submit:hover {
+      background: #5c1658;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">
+    <h2>Tirumala Tirupati Devasthanams (Simulated Portal)</h2>
+    <span>Om Namo Venkatesaya 🔔</span>
+  </div>
+
+  <!-- Seva Details -->
+  <div class="card">
+    <div class="card-title">Seva Details</div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <label>Seva Date</label>
+        <strong>24/11/2026</strong>
+      </div>
+      <div class="summary-item">
+        <label>Temple</label>
+        <strong>Sri KodandaRamaSwamy Temple</strong>
+      </div>
+      <div class="summary-item">
+        <label>Seva Name</label>
+        <strong>Kalyanotsavam on Pournami day</strong>
+      </div>
+      <div class="summary-item">
+        <label>No. of Tickets</label>
+        <strong>01</strong>
+      </div>
+      <div class="summary-item">
+        <label>Total Cost</label>
+        <strong>₹ 1000</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Form Container -->
+  <div class="card">
+    <!-- SECTION 1: GENERAL DETAILS -->
+    <div class="card-title">General Details</div>
+
+    <div class="form-grid-3">
+      <mat-form-field>
+        <mat-label>Email Address <span class="text-danger">*</span></mat-label>
+        <input type="email" id="email" formcontrolname="email" placeholder="Enter Email">
+        <div class="mat-error" id="err-email">⊗ This field is required</div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>City <span class="text-danger">*</span></mat-label>
+        <input type="text" id="city" formcontrolname="city" placeholder="Enter City">
+        <div class="mat-error" id="err-city">⊗ This field is required</div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>State <span class="text-danger">*</span></mat-label>
+        <input type="text" id="state" formcontrolname="state" placeholder="Enter State">
+        <div class="mat-error" id="err-state">⊗ This field is required</div>
+      </mat-form-field>
+    </div>
+
+    <div class="form-grid-2" style="max-width: 66%;">
+      <mat-form-field>
+        <mat-label>Country <span class="text-danger">*</span></mat-label>
+        <input type="text" id="country" formcontrolname="country" placeholder="Enter Country">
+        <div class="mat-error" id="err-country">⊗ This field is required</div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Pincode <span class="text-danger">*</span></mat-label>
+        <input type="text" id="pincode" formcontrolname="pincode" placeholder="Enter Pincode">
+        <div class="mat-error" id="err-pincode">⊗ This field is required</div>
+      </mat-form-field>
+    </div>
+
+    <hr>
+
+    <!-- SECTION 2: PILGRIM DETAILS -->
+    <div class="card-title">Pilgrim Details</div>
+
+    <!-- Pilgrim Row 1 -->
+    <div class="form-grid-5">
+      <mat-form-field>
+        <mat-label>Name <span class="text-danger">*</span></mat-label>
+        <input type="text" id="name0" formcontrolname="name0" placeholder="Full Name">
+        <div class="mat-error" id="err-name0">⊗ This field is required</div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Age <span class="text-danger">*</span></mat-label>
+        <input type="number" id="age0" formcontrolname="age0" placeholder="Age">
+        <div class="mat-error" id="err-age0">⊗ This field is required</div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Gender <span class="text-danger">*</span></mat-label>
+        <select id="gender0" formcontrolname="gender0">
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Transgender">Transgender</option>
+        </select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Photo ID Proof <span class="text-danger">*</span></mat-label>
+        <select id="idProof0" formcontrolname="idProof0">
+          <option value="">Select</option>
+          <option value="Aadhaar Card">Aadhaar Card</option>
+          <option value="Passport">Passport</option>
+          <option value="Voter ID">Voter ID</option>
+          <option value="PAN Card">PAN Card</option>
+        </select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Photo ID Number <span class="text-danger">*</span></mat-label>
+        <input type="text" id="idNo0" formcontrolname="idNo0" placeholder="ID Number">
+      </mat-form-field>
+    </div>
+
+    <!-- Pilgrim Row 2 -->
+    <div class="form-grid-5">
+      <mat-form-field>
+        <mat-label>Name <span class="text-danger">*</span></mat-label>
+        <input type="text" id="name1" formcontrolname="name1" placeholder="Full Name">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Age <span class="text-danger">*</span></mat-label>
+        <input type="number" id="age1" formcontrolname="age1" placeholder="Age">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Gender <span class="text-danger">*</span></mat-label>
+        <select id="gender1" formcontrolname="gender1">
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Transgender">Transgender</option>
+        </select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Photo ID Proof <span class="text-danger">*</span></mat-label>
+        <select id="idProof1" formcontrolname="idProof1">
+          <option value="">Select</option>
+          <option value="Aadhaar Card">Aadhaar Card</option>
+          <option value="Passport">Passport</option>
+          <option value="Voter ID">Voter ID</option>
+          <option value="PAN Card">PAN Card</option>
+        </select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Photo ID Number <span class="text-danger">*</span></mat-label>
+        <input type="text" id="idNo1" formcontrolname="idNo1" placeholder="ID Number">
+      </mat-form-field>
+    </div>
+
+    <div style="overflow: hidden; margin-top: 20px;">
+      <button class="btn-submit" id="btn-continue-test">Continue to Payment ⏩</button>
+    </div>
+  </div>
+
+  <script>
+    // Live validation listener: clears '⊗ This field is required' when input has value
+    document.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const errorEl = inp.parentElement.querySelector('.mat-error');
+        if (errorEl) {
+          if (inp.value.trim().length > 0) errorEl.classList.add('hidden');
+          else errorEl.classList.remove('hidden');
+        }
+      });
+      inp.addEventListener('change', () => {
+        const errorEl = inp.parentElement.querySelector('.mat-error');
+        if (errorEl) {
+          if (inp.value.trim().length > 0) errorEl.classList.add('hidden');
+          else errorEl.classList.remove('hidden');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
